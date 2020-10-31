@@ -7,6 +7,7 @@ import java.util.List;
 
 public class ContactDBService {
     private static ContactDBService contactDBService;
+    private PreparedStatement contactStatement;
 
     private ContactDBService(){}
 
@@ -71,5 +72,55 @@ public class ContactDBService {
     public List<Contact> readDateRangeData(LocalDate start, LocalDate end) {
         String sql=String.format("select * from contact where start between '%s' and '%s';", Date.valueOf(start), Date.valueOf(end));
         return this.getContactList(sql);
+    }
+
+    public List<Contact> readContactsByCity(String city) {
+        String sql=String.format("select * from contact where city='%s'",city);
+        return this.getContactList(sql);
+
+    }
+    public List<Contact> readContactsByState(String city) {
+        String sql=String.format("select * from contact where state='%s'",city);
+        return this.getContactList(sql);
+
+    }
+
+    public int updateContactData(String name, String address) {
+        String sql = String.format("update contact set address='%s' where first_name='%s';", address, name);
+        try (Connection connection = this.getConnection()) {
+            Statement statement = connection.createStatement();
+            return statement.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<Contact> getContactFromDB(String name) throws SQLException {
+        List<Contact> contactList = null;
+        if (this.contactStatement == null)
+            this.prepareStatementForEmployeeData();
+        try {
+            contactStatement.setString(1, name);
+            ResultSet resultSet = contactStatement.executeQuery();
+           contactList = this.getContact(resultSet);
+            getConnection().close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return contactList;
+
+
+    }
+
+    private void prepareStatementForEmployeeData() throws SQLException {
+        try {
+            Connection connection = this.getConnection();
+            String sql = "SELECT * FROM contact where first_name= ?";
+            contactStatement = connection.prepareStatement(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 }
