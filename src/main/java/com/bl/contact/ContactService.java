@@ -13,6 +13,9 @@ public class ContactService {
         contactDBService= ContactDBService.getInstance();
         this.contactDataList=new ArrayList<>();
     }
+    public void WelcomeMessage(){
+        System.out.println("Welcome to Adv Address Book JDBC problem");
+    }
     //Service To Retrieve All Data
     public List<Contact> readContactData() throws SQLException {
         this.contactDataList= contactDBService.readData();
