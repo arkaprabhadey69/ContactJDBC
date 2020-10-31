@@ -1,0 +1,2 @@
+NConnecting to . . .jdbc:mysql://localhost:3306/employeepayroll?userSSL=false
+5Connected com.mysql.cj.jdbc.ConnectionImpl@3360604b

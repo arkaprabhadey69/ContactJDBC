@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.bl.contact.ContactServiceTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-10-31T08:11:00" hostname="LAPTOP-JP0FR8LN" time="0.44">
+  <properties/>
+  <testcase name="readDataInGivenRange" classname="com.bl.contact.ContactServiceTest" time="0.44"/>
+  <system-out><![CDATA[Connecting to . . .jdbc:mysql://localhost:3306/employeepayroll?userSSL=false
+Connected com.mysql.cj.jdbc.ConnectionImpl@3360604b
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
