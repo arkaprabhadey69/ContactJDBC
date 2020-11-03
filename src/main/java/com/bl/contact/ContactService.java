@@ -3,7 +3,9 @@ package com.bl.contact;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ContactService {
     public List<Contact> contactDataList;
@@ -65,5 +67,47 @@ public class ContactService {
         return employeePayrollDataList.get(0).equals(getContactData(name));
 
     }
+    public int countEntries(){
+        return this.contactDataList.size();
+    }
 
+    public void addMultipleEmployee(List<Contact> contactList) {
+        contactList.forEach(contact -> {
+
+            try {
+                this.addContactToAddressBook(contact.firstName,contact.lastName,contact.address,contact.city,contact.state,contact.zip,contact.number,contact.email,contact.start);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+
+        });
+
+    }
+
+//    public void addMultipleEmployee(List<Contact> contactList){
+//        Map<Integer, Boolean> employeeStatus = new HashMap<>();
+//        contactList.forEach(contact -> {
+//            Runnable task = () -> {
+//                try {
+//                    employeeStatus.put(contact.hashCode(), false);
+//                    System.out.println("Adding.." + Thread.currentThread().getName());
+//                    this.addContactToAddressBook(contact.firstName,contact.lastName,contact.address,contact.city,contact.state,contact.zip,contact.number,contact.email,contact.start);
+//                    employeeStatus.put(contact.hashCode(), true);
+//                    System.out.println("Added!" + Thread.currentThread().getName());
+//                } catch (SQLException throwables) {
+//                    throwables.printStackTrace();
+//                }
+//            };
+//            Thread thread = new Thread(task, contact.firstName);
+//            thread.start();
+//        });
+//        while (employeeStatus.containsValue(false)) {
+//            try {
+//                Thread.sleep(10);
+//            } catch (InterruptedException e) {
+//            }
+//        }
+//
+//
+//    }
 }
