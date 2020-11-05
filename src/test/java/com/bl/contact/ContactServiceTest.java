@@ -1,6 +1,11 @@
 package com.bl.contact;
 
+import com.google.gson.Gson;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -8,6 +13,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -61,19 +67,88 @@ public class ContactServiceTest {
 
     }
     @Test
-    public void givenMultipleNamesShouldBeAdded() throws SQLException {
+    public void givenMultipleNamesShouldBeAdded() throws SQLException, InterruptedException {
         ContactService contactService= new ContactService();
         contactService.readContactData();
         Contact c= new Contact(0,"Saunak","Mondal","Hazra","Delhi","NCR", "700056","986754534","abc@yahoo.com",LocalDate.now());
         Contact c2= new Contact(0,"Krish","Mondal","Hazra","Delhi","NCR", "700056","986754534","abc@yahoo.com",LocalDate.now());
+        Contact c4= new Contact(0,"Rohit","Mondal","Hazra","Delhi","NCR", "700056","986754534","abc@yahoo.com",LocalDate.now());
         List<Contact> c3= new ArrayList<>();
         c3.add(c);
         c3.add(c2);
+        c3.add(c4);
+        contactService.readContactData();
         Instant start=Instant.now();
         contactService.addMultipleEmployee(c3);
+        Thread.sleep(1600);
         Instant end=Instant.now();
         System.out.println("Time: "+ Duration.between(start,end));
-        Assert.assertEquals(6,contactService.countEntries());
+        Assert.assertEquals(11,contactService.countEntries());
 
     }
+    @Before
+    public void setUP(){
+        RestAssured.baseURI = "http://localhost";
+        RestAssured.port = 3000;
+    }
+    private Contact[] getContactList() {
+        Response response = RestAssured.get("/contacts");
+        System.out.println("CONTACT ENTRIES IN JSON Server:\n" + response.asString());
+        Contact[] arrayOfContacts = new Gson().fromJson(response.asString(), Contact[].class);
+        return arrayOfContacts;
+    }
+    private Response addContactDataToJsonServer(Contact contact) {
+        String contactJson = new Gson().toJson(contact);
+        RequestSpecification requestSpecification = RestAssured.given();
+        requestSpecification.header("Content-Type", "application/json");
+        requestSpecification.body(contactJson);
+        return requestSpecification.post("/contacts");
+    }
+
+    @Test
+    public void givenContactDataInJsonServer_whenRetrieved_shouldMatchTheCount() {
+        Contact[] arrayOfContacts = getContactList();
+        ContactService addressBookService = new ContactService(Arrays.asList(arrayOfContacts));
+        long entries = addressBookService.countEntries();
+        Assert.assertEquals(2, entries);
+    }
+    @Test
+    public void givenContactData_whenAddedToJsonServer_ShouldMatchResponse201AndCount() {
+        ContactService addressBookService;
+        Contact[] arrayOfContacts = getContactList();
+        addressBookService = new ContactService(Arrays.asList(arrayOfContacts));
+        Contact contact = new Contact(0, "Orko", "Dey", "Ohio", "Kolkata", "WB", "400096", "669855975", "pj@gmail.com", LocalDate.now());
+        Response response = addContactDataToJsonServer(contact);
+        int statusCode = response.getStatusCode();
+        Assert.assertEquals(201, statusCode);
+        contact = new Gson().fromJson(response.asString(), Contact.class);
+        addressBookService.addEmployeeDataForREST(contact);
+        long entries = addressBookService.countEntries();
+        Assert.assertEquals(3, entries);
+    }
+    @Test
+    public void givenMultipleContacts_Should_Return_201(){
+            ContactService addressBookService;
+            Contact[] arrayOfContacts = getContactList();
+            addressBookService = new ContactService(Arrays.asList(arrayOfContacts));
+        Contact c= new Contact(0,"Saunak","Mondal","Hazra","Delhi","NCR", "700056","986754534","abc@yahoo.com",LocalDate.now());
+        Contact c2= new Contact(0,"Krish","Mondal","Hazra","Delhi","NCR", "700056","986754534","abc@yahoo.com",LocalDate.now());
+        Contact c4= new Contact(0,"Rohit","Mondal","Hazra","Delhi","NCR", "700056","986754534","abc@yahoo.com",LocalDate.now());
+        List<Contact> c3= new ArrayList<>();
+        c3.add(c);
+        c3.add(c2);
+        c3.add(c4);
+        for(Contact c5:c3) {
+            Response response = addContactDataToJsonServer(c5);
+            int statusCode = response.getStatusCode();
+            Assert.assertEquals(201, statusCode);
+            Contact contact = new Gson().fromJson(response.asString(), Contact.class);
+            addressBookService.addEmployeeDataForREST(contact);
+        }
+            long entries = addressBookService.countEntries();
+            Assert.assertEquals(6, entries);
+
+    }
+
+
 }
