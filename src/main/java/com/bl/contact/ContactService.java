@@ -16,6 +16,11 @@ public class ContactService {
         this.contactDataList = new ArrayList<>();
     }
 
+    public ContactService(List<Contact> contactList) {
+        super();
+        this.contactDataList=new ArrayList<>(contactList);
+    }
+
     public void WelcomeMessage() {
         System.out.println("Welcome to Adv Address Book JDBC problem");
     }
@@ -99,5 +104,9 @@ public class ContactService {
             thread.start();
         });
 
+    }
+
+    public void addEmployeeDataForREST(Contact contact) {
+        this.contactDataList.add(contact);
     }
 }
