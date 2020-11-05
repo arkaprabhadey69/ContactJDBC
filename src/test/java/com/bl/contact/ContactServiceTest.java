@@ -110,7 +110,7 @@ public class ContactServiceTest {
         Contact[] arrayOfContacts = getContactList();
         ContactService addressBookService = new ContactService(Arrays.asList(arrayOfContacts));
         long entries = addressBookService.countEntries();
-        Assert.assertEquals(2, entries);
+        Assert.assertEquals(6, entries);
     }
     @Test
     public void givenContactData_whenAddedToJsonServer_ShouldMatchResponse201AndCount() {
@@ -163,6 +163,21 @@ public class ContactServiceTest {
         Response response = request.put("/contacts/" + contact.id);
         int status = response.getStatusCode();
         Assert.assertEquals(200, status);
+    }
+    @Test
+    public void givenNameShouldBeDeleted() {
+        Contact[] contacts = getContactList();
+        ContactService employeePayrollService = new ContactService(Arrays.asList(contacts));
+        Contact contact = employeePayrollService.getContactData("Krish");
+        String empJSon = new Gson().toJson(contacts);
+        RequestSpecification request = RestAssured.given();
+        request.header("Content-Type", "application/json");
+        request.body(empJSon);
+        Response response = request.delete("/contacts/" + contact.id);
+        int status = response.getStatusCode();
+        Assert.assertEquals(200, status);
+       employeePayrollService.removeContact("Krish");
+        Assert.assertEquals(5,employeePayrollService.countEntries());
     }
 
 
